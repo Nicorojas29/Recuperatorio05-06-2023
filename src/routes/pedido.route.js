@@ -1,6 +1,7 @@
 const express = require('express')
 const pedidoControllers = require('../controllers/pedido.controller')
 
+
 const router = express.Router();
 
 router.get('/', pedidoControllers.getPedidos)   

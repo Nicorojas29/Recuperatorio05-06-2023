@@ -1,22 +1,17 @@
 const alumnos = require('../../data/alumnos.json')
-//const httpStatusCodes = require('http2').constants;
-
-/*
-const getAllAlumnos = (_, res) => {
-    res.status(httpStatusCodes.HTTP_STATUS_OK).json(alumnos)
-}  */
+const httpStatusCodes = require('http2').constants;
 
 const getAllAlumnos = (req, res)=> {
-    res.json(alumnos).status(200) 
+    res.status(httpStatusCodes.HTTP_STATUS_OK).json(alumnos)
 }  
 
 const getAlumnosByDni = (req, res) => {
     const dni = req.params.dni
     const alumno = alumnos.find (alumno => alumno.dni == dni)
     if (alumno){
-        res.status(200).json(alumno).status(200)
+        res.status(httpStatusCodes.HTTP_STATUS_OK).json(alumno).status(200)
     } else {
-        res.status(404).json({ mensaje: `El alumno con dni ${dni} no fue encontrado`} )
+        res.status(httpStatusCodes.HTPP_STATUS_NOT_FOUND).json({ mensaje: `El alumno con dni ${dni} no fue encontrado`} )
     }
 }
 
@@ -37,7 +32,7 @@ const putAlumnos = (req, res) => {
       }
       res.json(alumno);
     } else {
-      res.status(404).
+      res.status(httpStatusCodes.HTPP_STATUS_NOT_FOUND).
         json({resultado: "La operación de modicar no pudo ser realizada",
              mensaje: `El alumno con ese DNI ${dni} no fue encontrado`
              }
@@ -50,13 +45,13 @@ const postAlumnos = (req, res) => {
     const { dni, nombre, celiaco = false, edad } = req.body;
     // Validaciones
     if (!dni || dni.toString().length !== 8) {
-      return res.status(400).json({ error: 'El DNI debe tener 8 dígitos' });
+      return res.status(httpStatusCodes.HTPP_STATUS_BAD_REQUEST).json({ error: 'El DNI debe tener 8 dígitos' });
     }
     if (alumnos.find((alumno) => alumno.dni === dni)) {
-      return res.status(400).json({ error: 'El alumno ya está registrado' });
+      return res.status(httpStatusCodes.HTPP_STATUS_BAD_REQUEST).json({ error: 'El alumno ya está registrado' });
     }
     if (!edad || edad <= 18 || edad >= 99) {
-      return res.status(400).json({ error: 'La edad debe ser mayor a 18 y menor a 99 años' });
+      return res.status(httpStatusCodes.HTPP_STATUS_BAD_REQUEST).json({ error: 'La edad debe ser mayor a 18 y menor a 99 años' });
     }
 const alumno = {
     dni: parseInt(dni),
@@ -73,7 +68,7 @@ const deleteAlumnosByDni= (req, res) => {
     const dni = req.params.dni
     const indice = alumnos.findIndex (alumno => alumno.dni == dni)
     if (indice==-1) {
-       res.status(404).json
+       res.status( httpStatusCodes.HTPP_STATUS_NOT_FOUND).json
        ( {
           resultado :"El alumno no pudo ser eliminado ",
           mensaje: `EL alumno con ese DNI ${id} no fue encontrado`
@@ -82,7 +77,7 @@ const deleteAlumnosByDni= (req, res) => {
     } else {
        const alumno = alumnos[indice];
        resultado = alumnos.splice(indice,1)
-       res.status(200).json( {resultado:"El alumno fue eliminado con exito",
+       res.status(httpStatusCodes.HTTP_STATUS_OK).json( {resultado:"El alumno fue eliminado con exito",
                  alumno: alumno})
     }
 }  

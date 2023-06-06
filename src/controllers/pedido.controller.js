@@ -1,10 +1,11 @@
 const pedidos = require('../../data/pedidos.json')
+const httpStatusCodes = require('http2').constants;
 
 const viandas = []; // Array de viandas disponibles
 let idCounter = 1; // Contador para generar el ID de los pedidos
 
 const getPedidos = (req, res)=> {
-    res.json(pedidos).status(200) 
+    res.status(httpStatusCodes.HTTP_STATUS_OK).json(pedidos)
 }  
 
 const getPedidosByid =(req, res) => {
@@ -13,7 +14,7 @@ const getPedidosByid =(req, res) => {
     if (pedido) {
       res.json(pedido);
     } else {
-      res.status(404).json({ Mensaje: 'El Pedido no fue encontrado' });
+      res.status(httpStatusCodes.HTPP_STATUS_NOT_FOUND).json({ Mensaje: 'El Pedido no fue encontrado' });
     }
   };
   
@@ -41,8 +42,7 @@ const vianda = viandas.find((vianda) => vianda.tipo === tipo && vianda.aptoCelia
     if (!vianda) {
       return res.status(400).json({ error: 'No hay viandas disponibles que cumplan con las condiciones' });
     }
-  
-    // Crear el pedido
+// Crear el pedido
 const fecha = new Date().toISOString().slice(0, 10);
 const pedido = {
       id: idCounter,
@@ -52,26 +52,26 @@ const pedido = {
         nombre: alumno.nombre,
         celiaco: alumno.celiaco,
         edad: alumno.edad
-      },
+    },
       vianda: {
         codigo: vianda.codigo,
         tipo: vianda.tipo,
         aptoCeliaco: vianda.aptoCeliaco,
         descripcion: vianda.descripcion
-      }
-    };
+    }
+};
   
-    // Desminuye el stock de la vianda en 1 unidad
-    vianda.stock--;
+// Desminuye el stock de la vianda en 1 unidad
+ vianda.stock--;
 
-    // Deshabilita al alumno
-    alumno.habilitado = false;
+// Deshabilita al alumno
+alumno.habilitado = false;
   
-    // Agregar el pedido al array de pedidos
+// Agregar el pedido al array de pedidos
     pedidos.push(pedido);
     idCounter++;
   
-    // Devolver el pedido creado
+// Devolver el pedido creado
     res.json(pedido);
   };
   
