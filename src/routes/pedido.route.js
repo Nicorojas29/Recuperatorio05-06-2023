@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/', pedidoControllers.getPedidos)   
 router.get ('/:id', pedidoControllers.getPedidosByid)
-router.get ('/', pedidoControllers.getUltimoPedidos)
+router.get ('/search', pedidoControllers.getPedidossearch)
 router.post( '/', pedidoControllers.postPedidos)
 router.delete('/:id', pedidoControllers.deletePedidosByid)
 

@@ -23,10 +23,10 @@ const { dni, tipo } = req.body;
     // Verificar si el alumno está habilitado
 const alumno = { dni: 123456789, nombre: 'Nombre del Alumno', celiaco: false, edad: 18 }; 
     if (!alumno) {
-      return res.status(400).json({ error: 'Alumno no encontrado' });
+      return res.status(400).json({ mensaje: 'Alumno no encontrado' });
     }
     if (!alumno.habilitado) {
-      return res.status(400).json({ error: 'El alumno no está habilitado para realizar un pedido' });
+      return res.status(400).json({ mensaje: 'El alumno no está habilitado para realizar un pedido' });
     }
     
 // Verifica el tipo de vianda solicitado
@@ -34,13 +34,13 @@ const tiposPermitidos = ['TARTA', 'POLLO', 'PASTA', 'PIZZA', 'EMPANADAS'];
     if (!tiposPermitidos.includes(tipo)) {
       return res
         .status(400)
-        .json({ error: 'Tipo de vianda incorrecto. Los tipos permitidos son: TARTA, POLLO, PASTA, PIZZA, EMPANADAS' });
+        .json({ mensaje: 'Tipo de vianda incorrecto. Los tipos permitidos son: TARTA, POLLO, PASTA, PIZZA, EMPANADAS' });
     }
 
 // Buscar una vianda que cumpla con las condiciones
 const vianda = viandas.find((vianda) => vianda.tipo === tipo && vianda.aptoCeliaco === alumno.celiaco && vianda.stock > 0);
     if (!vianda) {
-      return res.status(400).json({ error: 'No hay viandas disponibles que cumplan con las condiciones' });
+      return res.status(400).json({ mensaje: 'No hay viandas disponibles que cumplan con las condiciones' });
     }
 // Crear el pedido
 const fecha = new Date().toISOString().slice(0, 10);
@@ -76,8 +76,8 @@ alumno.habilitado = false;
   };
 
 // PUNTO BONUS
-// Obtener el último pedido realizado por el nombre del alumno
-const getUltimoPedidos = (req, res) => {
+// Se obtiene el último pedido realizado por el nombre del alumno
+const getPedidossearch = (req, res) => {
     const nombre = req.query.nombre;
     const pedido = pedidos
       .filter((pedido) => pedido.alumno.nombre === nombre)
@@ -86,7 +86,7 @@ const getUltimoPedidos = (req, res) => {
     if (pedido) {
       res.json(pedido);
     } else {
-      res.json({ message: 'No encontrado' });
+      res.status(404).json({ mensaje: 'No encontrado' });
     }
   };
   
@@ -94,25 +94,26 @@ const getUltimoPedidos = (req, res) => {
 const deletePedidosByid = (req, res) => {
     const id = parseInt(req.params.id);
     const pedidoIndex = pedidos.findIndex((pedido) => pedido.id === id);
-  
+
     if (pedidoIndex !== -1) {
       const pedido = pedidos[pedidoIndex];
   
-      // Incrementar en una unidad el stock de la vianda
+      // Se incrementa en una unidad el stock de la vianda
       const vianda = viandas.find((vianda) => vianda.codigo === pedido.vianda.codigo);
       vianda.stock++;
+      pedido.alumno.habilitado = true;
   
-      // Habilitar al alumno
+      // Habilita al alumno
       const alumno = alumnos.find((alumno) => alumno.dni === pedido.alumno.dni);
       alumno.habilitado = true;
   
-      // Eliminar el pedido
+      // Elimina el pedido
       pedidos.splice(pedidoIndex, 1);
   
-      res.json({ message: 'Pedido borrado correctamente' });
+      res.json({ mensaje: 'El Pedido fue borrado correctamente' });
     } else {
-      res.status(404).json({ error: 'Pedido no encontrado' });
+      res.status(404).json({ mensaje: 'EL Pedido no fue encontrado' });
     }
   };
   
-module.exports = {getPedidos, getPedidosByid, postPedidos, getUltimoPedidos, deletePedidosByid}
+module.exports = {getPedidos, getPedidosByid, postPedidos, getPedidossearch, deletePedidosByid}
