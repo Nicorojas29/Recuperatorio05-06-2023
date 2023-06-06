@@ -41,7 +41,7 @@ const putAlumnos = (req, res) => {
     }
 }; */
 
-
+// Modifica un alumno por su DNI
 const putAlumnos = (req, res) => {
     const dni = req.params.dni;
     const { habilitado, celiaco, edad } = req.body;
@@ -62,15 +62,13 @@ const putAlumnos = (req, res) => {
         json({resultado: "La operación de modicar no pudo ser realizada",
              mensaje: `El alumno con ese DNI ${dni} no fue encontrado`
              }
-            );
+        );
     }
-  };  
+};  
 
-
-
+//Registro un nuevo alumno
 const postAlumnos = (req, res) => {
-    const { dni, nombre, habilitado = true, celiaco = false, edad } = req.body;
-  
+    const { dni, nombre, celiaco = false, edad } = req.body;
     // Validaciones
     if (!dni || dni.toString().length !== 8) {
       return res.status(400).json({ error: 'El DNI debe tener 8 dígitos' });
@@ -79,21 +77,17 @@ const postAlumnos = (req, res) => {
       return res.status(400).json({ error: 'El alumno ya está registrado' });
     }
     if (!edad || edad <= 18 || edad >= 99) {
-      return res
-        .status(400)
-        .json({ error: 'La edad debe ser mayor a 18 y menor a 99 años' });
+      return res.status(400).json({ error: 'La edad debe ser mayor a 18 y menor a 99 años' });
     }
-  
 const alumno = {
     dni: parseInt(dni),
     nombre,
-    habilitado,
+    habilitado: true,
     celiaco,
     edad,
 };
 alumnos.push(alumno);
-  
-res.json({ message: 'Alumno registrado correctamente', alumno });
+res.status(201).json(alumno);
 };
   
 const deleteAlumnosByDni= (req, res) => {
