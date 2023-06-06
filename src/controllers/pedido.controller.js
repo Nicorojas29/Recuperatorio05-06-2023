@@ -29,7 +29,7 @@ const alumno = { dni: 123456789, nombre: 'Nombre del Alumno', celiaco: false, ed
       return res.status(400).json({ error: 'El alumno no está habilitado para realizar un pedido' });
     }
     
-    // Verifica el tipo de vianda solicitado
+// Verifica el tipo de vianda solicitado
 const tiposPermitidos = ['TARTA', 'POLLO', 'PASTA', 'PIZZA', 'EMPANADAS'];
     if (!tiposPermitidos.includes(tipo)) {
       return res
@@ -74,5 +74,45 @@ alumno.habilitado = false;
 // Devolver el pedido creado
     res.json(pedido);
   };
+
+// PUNTO BONUS
+// Obtener el último pedido realizado por el nombre del alumno
+const getUltimoPedidos = (req, res) => {
+    const nombre = req.query.nombre;
+    const pedido = pedidos
+      .filter((pedido) => pedido.alumno.nombre === nombre)
+      .sort((a, b) => b.id - a.id)[0];
   
-module.exports = {getPedidos, getPedidosByid, postPedidos}
+    if (pedido) {
+      res.json(pedido);
+    } else {
+      res.json({ message: 'No encontrado' });
+    }
+  };
+  
+  // Borrar un pedido por su ID
+const deletePedidosByid = (req, res) => {
+    const id = parseInt(req.params.id);
+    const pedidoIndex = pedidos.findIndex((pedido) => pedido.id === id);
+  
+    if (pedidoIndex !== -1) {
+      const pedido = pedidos[pedidoIndex];
+  
+      // Incrementar en una unidad el stock de la vianda
+      const vianda = viandas.find((vianda) => vianda.codigo === pedido.vianda.codigo);
+      vianda.stock++;
+  
+      // Habilitar al alumno
+      const alumno = alumnos.find((alumno) => alumno.dni === pedido.alumno.dni);
+      alumno.habilitado = true;
+  
+      // Eliminar el pedido
+      pedidos.splice(pedidoIndex, 1);
+  
+      res.json({ message: 'Pedido borrado correctamente' });
+    } else {
+      res.status(404).json({ error: 'Pedido no encontrado' });
+    }
+  };
+  
+module.exports = {getPedidos, getPedidosByid, postPedidos, getUltimoPedidos, deletePedidosByid}
